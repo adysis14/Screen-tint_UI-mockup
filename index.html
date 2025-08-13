@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option 1: Screen Tint - Accurate Windows Settings UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f3f3f3;
+            color: #323130;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        .settings-window {
+            display: flex;
+            height: 100vh;
+            background-color: white;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: #f3f3f3;
+            border-right: 1px solid #e5e5e5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-header {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .search-container {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .user-profile {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #0078d4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .nav-menu {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            gap: 12px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            color: #323130;
+        }
+
+        .nav-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .nav-item.active {
+            background-color: #e3f2fd;
+            border-right: 3px solid #0078d4;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            padding: 24px 32px 0;
+            border-bottom: 1px solid #edebe9;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #605e5c;
+            margin-bottom: 8px;
+        }
+
+        .breadcrumb a {
+            color: #0078d4;
+            text-decoration: none;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .content-body {
+            padding: 24px 32px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f2f1;
+            min-height: 64px;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 16px;
+            opacity: 0.7;
+        }
+
+        .setting-content {
+            flex: 1;
+        }
+
+        .setting-title {
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .setting-description {
+            font-size: 13px;
+            color: #605e5c;
+            line-height: 1.3;
+        }
+
+        .setting-link {
+            color: #0078d4;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .setting-control {
+            margin-left: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background-color: #605e5c;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch.on {
+            background-color: #0078d4;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.on::after {
+            transform: translateX(20px);
+        }
+
+        .dropdown {
+            padding: 8px 12px;
+            border: 1px solid #605e5c;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 14px;
+            min-width: 180px;
+        }
+
+        .slider {
+            width: 300px;
+            height: 4px;
+            background: #e1dfdd;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #0078d4;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .chevron-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
+        }
+
+        .screen-tint-expanded {
+            padding: 20px 0;
+            margin-top: 12px;
+            display: none;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .screen-tint-expanded.show {
+            display: block;
+        }
+
+        .tint-controls {
+            display: grid;
+            gap: 20px;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .control-label {
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .color-picker-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .color-preset {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+            z-index: 10001;
+        }
+
+        .color-preset:hover,
+        .color-preset.selected {
+            border-color: #0078d4;
+        }
+
+        .color-preset.blue { background-color: #add8e6; }
+        .color-preset.yellow { background-color: #ffffe0; }
+        .color-preset.green { background-color: #90ee90; }
+        .color-preset.pink { background-color: #ffb6c1; }
+        .color-preset.grey { background-color: #d3d3d3; }
+        .color-preset.custom { 
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff);
+        }
+
+        .preview-note {
+            background-color: #f8f9fa;
+            border: 1px solid #e1dfdd;
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            color: #323130;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #605e5c;
+        }
+
+        .screen-tint-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            background-color: #add8e6;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+            mix-blend-mode: multiply;
+        }
+
+        .screen-tint-overlay.active {
+            opacity: 0.3;
+        }
+
+        .keyboard-shortcut {
+            font-family: 'Consolas', monospace;
+            background-color: #f3f2f1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #e1dfdd;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-window">
+        <!-- Full screen tint overlay -->
+        <div class="screen-tint-overlay" id="screenTintOverlay"></div>
+        
+        <div class="sidebar">
+            <div class="settings-header">
+                <button class="back-button">←</button>
+                <span class="settings-title">Settings</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Find a setting">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-avatar">AS</div>
+                <div class="user-info">
+                    <div class="user-name">Aadya Singh</div>
+                    <div class="user-email">v-aadyasingh@microsoft.com</div>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Home
+                </button>
+                <button class="nav-item active">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                    </svg>
+                    System
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM15 4a1 1 0 10-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4z"/>
+                    </svg>
+                    Bluetooth & devices
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"/>
+                    </svg>
+                    Network & internet
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4z"/>
+                    </svg>
+                    Personalization
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"/>
+                    </svg>
+                    Apps
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"/>
+                    </svg>
+                    Accounts
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+                    </svg>
+                    Time & language
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 000 1.788l4 2.068V11a1 1 0 11-2 0v4.236z"/>
+                    </svg>
+                    Gaming
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                    </svg>
+                    Accessibility
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                    </svg>
+                    Privacy & security
+                </button>
+                <button class="nav-item">
+                    <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"/>
+                    </svg>
+                    Windows Update
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <div class="breadcrumb">
+                    <a href="#">System</a> &gt; Display
+                </div>
+                <h1 class="page-title">Display</h1>
+            </div>
+
+            <div class="content-body">
+                <div class="section">
+                    <h2 class="section-title">Brightness & color</h2>
+                    
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2.5a.5.5 0 01.5.5v1a.5.5 0 01-1 0V3a.5.5 0 01.5-.5zM10 16a.5.5 0 01.5.5v1a.5.5 0 01-1 0v-1a.5.5 0 01.5-.5zM3 10a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1A.5.5 0 013 10zM15.5 9.5a.5.5 0 000 1h1a.5.5 0 000-1h-1zM5.05 5.05a.5.5 0 01.707 0l.707.707a.5.5 0 01-.707.707L5.05 5.757a.5.5 0 010-.707zM13.536 13.536a.5.5 0 01.707 0l.707.707a.5.5 0 01-.707.707l-.707-.707a.5.5 0 010-.707zM14.95 5.05a.5.5 0 010 .707l-.707.707a.5.5 0 11-.707-.707l.707-.707a.5.5 0 01.707 0zM6.464 13.536a.5.5 0 010 .707l-.707.707a.5.5 0 11-.707-.707l.707-.707a.5.5 0 01.707 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Brightness</div>
+                            <div class="setting-description">Change brightness for the built-in display</div>
+                        </div>
+                        <div class="setting-control">
+                            <input type="range" class="slider" value="70" min="0" max="100">
+                            <svg class="chevron-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-content">
+                            <div class="setting-title">Change brightness based on content</div>
+                            <div class="setting-description">Help save power by optimizing screen contrast and brightness for the content shown<br>
+                                <a href="#" class="setting-link">Learn more</a>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="dropdown">
+                                <option>On battery only</option>
+                                <option>Always</option>
+                                <option>Never</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2a8 8 0 108 8 8 8 0 00-8-8zm0 14a6 6 0 01-6-6 6 6 0 0112 0 6 6 0 01-6 6z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Night light</div>
+                            <div class="setting-description">Use warmer colors to help block blue light</div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch" onclick="toggleNightLight(this)"></div>
+                        </div>
+                    </div>
+
+                    <!-- NEW SCREEN TINT FEATURE -->
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Screen tint</div>
+                            <div class="setting-description">Apply a customizable colored overlay to reduce eye strain and visual stress<br>Press Win + Ctrl + T to turn screen tint on and off</div>
+                            <div class="screen-tint-expanded" id="screenTintExpanded">
+                                <div class="tint-controls">
+                                    <div class="control-group">
+                                        <span class="control-label">Tint color</span>
+                                        <div class="color-picker-container">
+                                            <div class="color-preset blue selected" onclick="selectColor(this, '#add8e6')"></div>
+                                            <div class="color-preset yellow" onclick="selectColor(this, '#ffffe0')"></div>
+                                            <div class="color-preset green" onclick="selectColor(this, '#90ee90')"></div>
+                                            <div class="color-preset pink" onclick="selectColor(this, '#ffb6c1')"></div>
+                                            <div class="color-preset grey" onclick="selectColor(this, '#d3d3d3')"></div>
+                                            <div class="color-preset custom" onclick="selectColor(this, 'custom')"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="control-group">
+                                        <span class="control-label">Strength</span>
+                                        <input type="range" class="slider" value="30" min="0" max="100" oninput="updateTintStrength(this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch" onclick="toggleScreenTint(this)" id="screenTintToggle"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 3a2 2 0 00-2 2v1.816a.5.5 0 00.5.5h15a.5.5 0 00.5-.5V5a2 2 0 00-2-2H4z"/>
+                            <path fill-rule="evenodd" d="M2 8.316V17a2 2 0 002 2h12a2 2 0 002-2V8.316H2zm8 5.684a1 1 0 100-2 1 1 0 000 2z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Color profile</div>
+                            <div class="setting-description">Determine how colors appear on your screen</div>
+                        </div>
+                        <div class="setting-control">
+                            <svg class="chevron-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="3" width="16" height="10" rx="2" fill="currentColor"/>
+                            <text x="10" y="9" text-anchor="middle" fill="white" font-size="6">HDR</text>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">HDR</div>
+                            <div class="setting-description">
+                                <a href="#" class="setting-link">More about HDR</a>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <svg class="chevron-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Scale & layout</h2>
+                    
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Scale</div>
+                            <div class="setting-description">Change the size of text, apps, and other items</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="dropdown">
+                                <option>150% (Recommended)</option>
+                                <option>100%</option>
+                                <option>125%</option>
+                                <option>175%</option>
+                                <option>200%</option>
+                            </select>
+                            <svg class="chevron-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <svg class="setting-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4V5h12v10z"/>
+                        </svg>
+                        <div class="setting-content">
+                            <div class="setting-title">Display resolution</div>
+                        </div>
+                        <div class="setting-control">
+                            <select class="dropdown">
+                                <option>1920 × 1080 (Recommended)</option>
+                                <option>1600 × 900</option>
+                                <option>1280 × 720</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleNightLight(toggle) {
+            toggle.classList.toggle('on');
+        }
+
+        function toggleScreenTint(toggle) {
+            toggle.classList.toggle('on');
+            const expanded = document.getElementById('screenTintExpanded');
+            const overlay = document.getElementById('screenTintOverlay');
+            
+            if (toggle.classList.contains('on')) {
+                expanded.classList.add('show');
+                overlay.classList.add('active');
+            } else {
+                expanded.classList.remove('show');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function selectColor(element, color) {
+            document.querySelectorAll('.color-preset').forEach(preset => {
+                preset.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            const overlay = document.getElementById('screenTintOverlay');
+            
+            if (color !== 'custom') {
+                overlay.style.backgroundColor = color;
+            }
+        }
+
+        function updateTintStrength(value) {
+            const overlay = document.getElementById('screenTintOverlay');
+            const toggle = document.getElementById('screenTintToggle');
+            
+            if (toggle.classList.contains('on')) {
+                // Limit maximum opacity to 60% so content remains visible
+                const maxOpacity = Math.min(value / 100, 0.6);
+                overlay.style.opacity = maxOpacity;
+            }
+        }
+    </script>
+</body>
+</html>
