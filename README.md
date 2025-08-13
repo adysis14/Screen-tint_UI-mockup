@@ -42,8 +42,6 @@ Or open `index.html` locally in any modern web browser to interact with the mock
 3. **Choose a color**: Click any color preset to see instant changes
 4. **Adjust intensity**: Move the strength slider to find your preferred level
 
-## 🏗️ Design Principles
-
 ## 🎯 User Experience
 
 The mockup demonstrates how the Screen Tint feature would integrate seamlessly into Windows Display Settings, providing:
@@ -65,3 +63,4 @@ This mockup is created for demonstration purposes as part of the Screen Tint fea
 **Created by**: Aadya Singh  
 **Date**: August 2025  
 **Purpose**: Windows Accessibility Feature Proposal - Screen Tint UI Mockup
+
